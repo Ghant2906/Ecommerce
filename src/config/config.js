@@ -7,7 +7,10 @@ module.exports = {
     "database": "db_ecommerce",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "logging": false
+    "logging": false,
+    "query": {
+      "raw": true,
+    }
   },
   "test": {
     "username": "root",

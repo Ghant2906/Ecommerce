@@ -66,12 +66,15 @@ let handleRegister = (data) => {
                 })
             } else {
                 let hashPassword = await hashUserPassword(data.password);
+                let role = await db.Role.findOne({
+                    where: {name: data.role}
+                })
                 await db.Account.create({
                     email: data.email,
                     password: hashPassword,
                     name: data.name,
                     phoneNumber: data.phoneNumber,
-                    idRole: '711821a4-91bd-11ee-90a2-c03eba29bf1f'
+                    idRole: role.id
                 })
                 resolve({
                     errCode: 0,
