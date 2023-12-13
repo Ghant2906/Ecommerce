@@ -27,6 +27,9 @@ module.exports = {
     "port": process.env.DB_PORT,
     "dialect": "mysql",
     "logging": false,
+    "query": {
+      "raw": true,
+    },
     "ssl": {
       "require": true,
       "rejectUnauthorized": false
