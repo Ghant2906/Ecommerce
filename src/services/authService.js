@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt'
 const jwt = require('jsonwebtoken');
 const { Op } = require('sequelize');
 const nodemailer = require('nodemailer');
-const crypto = require('crypto');
 require('dotenv').config();
 
 const salt = bcrypt.genSaltSync(10);
@@ -35,12 +34,19 @@ let handleLogin = (email, password) => {
             } else {
                 let checkPass = bcrypt.compareSync(password, user.password)
                 if (checkPass) {
-                    delete user.password
-                    resolve({
-                        errCode: 0,
-                        token: jwt.sign({ data: user }, process.env.KEY_SECRET),
-                        role: user['Role.name']
-                    })
+                    if (user.status != 'Confirmed') {
+                        resolve({
+                            errCode: 3,
+                            errMsg: "Your account unconfirmed"
+                        })
+                    } else {
+                        delete user.password
+                        resolve({
+                            errCode: 0,
+                            token: jwt.sign({ data: user }, process.env.KEY_SECRET),
+                            role: user['Role.name']
+                        })
+                    }
                 } else {
                     resolve({
                         errCode: 2,
@@ -78,16 +84,13 @@ let handleRegister = (data) => {
                 })
             } else {
                 const token = jwt.sign({ email: data.email }, process.env.KEY_SECRET)
-
                 let link = `${process.env.CLIENT_URL}/api/confirmRegister/${token}`
-
                 const mailOptions = {
                     from: process.env.G_MAIL,
                     to: data.email,
                     subject: 'Confirm Register',
                     text: `Click on the following link to confirm your account: ${link}.`,
                 };
-
                 transporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
                         console.error(error);
